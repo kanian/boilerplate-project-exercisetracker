@@ -42,10 +42,10 @@ app.get('/api/exercise/users', async function(req, res){
   }
 })
 
-app.get('/api/exercise/log/:userId', async function(req, res) {
-  const {userId} = req.params
+app.get('/api/exercise/log/:userId/:from/:to/:limit', async function(req, res) {
+  const {userId, from, to, limit} = req.params
   try {
-    const result = await listUserExercises(userId)
+    const result = await listUserExercises(userId, from, to, limit)
     if (result instanceof Error) {
       res.json(result.message)
     }

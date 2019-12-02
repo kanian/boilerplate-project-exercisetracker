@@ -103,14 +103,40 @@ const findPersonByUsername = async function(username) {
   return await Person.findOne({ username })
 }
 /** List User Exercises */
-const listUserExercises = async function(userId) {
+const listUserExercises = async function(userId, _from, _to, _limit) {
   const person = await findPersonById(userId)
   if (!person) {
     throw new Error(`User does not exist`)
   }
-  return await Exercise.find({ username: person.username }).select(
-    'username description duration date'
-  )
+  const result = await to(
+    from(
+      limit(Exercise.find({ username: person.username }), parseInt(_limit)),
+      _from
+    ),
+    _to
+  ).select('username description duration date')
+  return result
+}
+
+const limit = function(query, limit) {
+  if (limit === undefined) {
+    return query
+  }
+  return query.limit(limit)
+}
+
+const from = function(query, date) {
+  if (from === undefined) {
+    return query
+  }
+  return query.where('date').gte(new Date(date))
+}
+
+const to = function(query, date) {
+  if (from === undefined) {
+    return query
+  }
+  return query.where('date').lte(new Date(date))
 }
 
 /** Find an Exercise by username, description, duration, date */
