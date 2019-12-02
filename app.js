@@ -48,17 +48,17 @@ const createAndSavePerson = async function(_username) {
 /** Create and Save a Person */
 
 const createAndSaveExercise = async function(
-  username,
+  userId,
   description,
   duration,
   date
 ) {
-  const userFound = await findPersonByUsername(username)
+  const userFound = await findPersonById(userId)
   if (!userFound) {
-    throw new Error(`Person ${username} does not exist`)
+    throw new Error(`User does not exist`)
   }
 
-  const found = await findExercise(username, description, duration, date)
+  const found = await findExercise(userFound.username, description, duration, date)
   // If err
   if (found instanceof Error) {
     throw found
@@ -68,8 +68,15 @@ const createAndSaveExercise = async function(
     throw new Error('exercise already created')
   }
 
+  // In case date is undefined
+  if(typeof date === 'undefined'){
+    date = new Date()
+  } else {
+    date = new Date(date)
+  }
+
   const exercise = new Exercise({
-    username,
+    username: userFound.username,
     description,
     duration,
     date
@@ -84,6 +91,10 @@ const listUsers = async function() {
     'username _id'
   )
 }
+/** Find Person by id */
+const findPersonById = async function(id){
+  return await Person.findById(id)
+}
 /** Find a Person by username */
 const findPersonByUsername = async function(username) {
   return await Person.findOne({ username })
@@ -91,7 +102,7 @@ const findPersonByUsername = async function(username) {
 
 /** Find an Exercise by username, description, duration, date */
 const findExercise = async function(username, description, duration, date) {
-  return await URL.findOne({ username, description, duration, date }).select(
+  return await Exercise.findOne({ username, description, duration, date }).select(
     'username, description, duration, date -_id'
   )
 }

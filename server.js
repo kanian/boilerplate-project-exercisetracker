@@ -46,6 +46,20 @@ app.get('/api/exercise/users', async function(req, res){
     res.json('Internal Server Error')
   }
 })
+
+app.post('/api/exercise/add', async function(req, res) {
+  const {userId, description, duration, date} = req.body
+  try {
+    const result = await createAndSaveExercise(userId, description, duration, date)
+    if (result instanceof Error) {
+      res.json(result.message)
+    }
+    res.json(result)
+  } catch (err) {
+    res.json('Internal Server Error')
+  }
+})
+
 // Not found middleware
 app.use((req, res, next) => {
   return next({ status: 404, message: 'not found' })
