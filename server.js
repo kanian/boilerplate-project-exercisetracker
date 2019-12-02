@@ -5,8 +5,7 @@ const {
   createAndSaveExercise,
   createAndSavePerson,
   listUsers,
-  findExercise,
-  findPersonByUsername
+  listUserExercises
 } = require('./app')
 
 const cors = require('cors')
@@ -19,10 +18,6 @@ app.use(bodyParser.json())
 app.use(express.static('public'))
 app.get('/', (req, res) => {
   res.sendFile(__dirname + '/views/index.html')
-})
-
-app.post('/', function(req, res) {
-  res.json('ok')
 })
 
 app.post('/api/exercise/new-user', async function(req, res) {
@@ -47,10 +42,10 @@ app.get('/api/exercise/users', async function(req, res){
   }
 })
 
-app.post('/api/exercise/add', async function(req, res) {
-  const {userId, description, duration, date} = req.body
+app.get('/api/exercise/log/:userId', async function(req, res) {
+  const {userId} = req.params
   try {
-    const result = await createAndSaveExercise(userId, description, duration, date)
+    const result = await listUserExercises(userId)
     if (result instanceof Error) {
       res.json(result.message)
     }
@@ -59,6 +54,8 @@ app.post('/api/exercise/add', async function(req, res) {
     res.json('Internal Server Error')
   }
 })
+
+
 
 // Not found middleware
 app.use((req, res, next) => {

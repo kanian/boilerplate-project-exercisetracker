@@ -58,7 +58,12 @@ const createAndSaveExercise = async function(
     throw new Error(`User does not exist`)
   }
 
-  const found = await findExercise(userFound.username, description, duration, date)
+  const found = await findExercise(
+    userFound.username,
+    description,
+    duration,
+    date
+  )
   // If err
   if (found instanceof Error) {
     throw found
@@ -69,7 +74,7 @@ const createAndSaveExercise = async function(
   }
 
   // In case date is undefined
-  if(typeof date === 'undefined'){
+  if (typeof date === 'undefined') {
     date = new Date()
   } else {
     date = new Date(date)
@@ -87,27 +92,39 @@ const createAndSaveExercise = async function(
 
 /** List People */
 const listUsers = async function() {
-  return await Person.find().select(
-    'username _id'
-  )
+  return await Person.find().select('username _id')
 }
 /** Find Person by id */
-const findPersonById = async function(id){
+const findPersonById = async function(id) {
   return await Person.findById(id)
 }
 /** Find a Person by username */
 const findPersonByUsername = async function(username) {
   return await Person.findOne({ username })
 }
+/** List User Exercises */
+const listUserExercises = async function(userId) {
+  const person = await findPersonById(userId)
+  if (!person) {
+    throw new Error(`User does not exist`)
+  }
+  return await Exercise.find({ username: person.username }).select(
+    'username description duration date'
+  )
+}
 
 /** Find an Exercise by username, description, duration, date */
 const findExercise = async function(username, description, duration, date) {
-  return await Exercise.findOne({ username, description, duration, date }).select(
-    'username, description, duration, date -_id'
-  )
+  return await Exercise.findOne({
+    username,
+    description,
+    duration,
+    date
+  }).select('username description duration date -_id')
 }
 exports.createAndSaveExercise = createAndSaveExercise
 exports.createAndSavePerson = createAndSavePerson
 exports.findExercise = findExercise
 exports.findPersonByUsername = findPersonByUsername
 exports.listUsers = listUsers
+exports.listUserExercises = listUserExercises
